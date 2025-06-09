@@ -1,0 +1,22 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><title>CO₂ Toll</title>
+</head><body>
+<h1>CO₂ Toll Calculator – MVP</h1>
+<form id=f>
+  <input id=vin placeholder="VIN" required>
+  <input id=route placeholder="Bratislava – Linz" required>
+  <button>Calculate</button>
+</form>
+<pre id=out></pre>
+<script>
+f.onsubmit = async e=>{
+ e.preventDefault();
+ const res = await fetch('/api/calc',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({vin:vin.value,route:route.value})
+ });
+ out.textContent = await res.text();
+};
+</script>
+</body></html>
