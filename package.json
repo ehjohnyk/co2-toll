@@ -1,0 +1,4 @@
+{
+  "name": "co2-toll", "type":"module",
+  "dependencies": { "fastify":"^4","node-fetch":"^3","pg":"^8" }
+}
