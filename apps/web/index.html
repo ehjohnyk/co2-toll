@@ -16,7 +16,8 @@ f.onsubmit = async e=>{
   headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vin:vin.value,route:route.value})
  });
- out.textContent = await res.text();
+ const data = await res.json();
+ out.textContent = `SK ${data.kmSK.toFixed(1)} km\nAT ${data.kmAT.toFixed(1)} km\nDE ${data.kmDE.toFixed(1)} km\nPrice €${data.price.toFixed(2)}`;
 };
 </script>
 </body></html>
