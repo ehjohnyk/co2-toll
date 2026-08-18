@@ -1,133 +1,40 @@
-# Repository Autonomous Execution Contract V1
+# Repository Autonomous Execution Contract V2
 
 Status: CANONICAL AGENT GOVERNANCE
 
-This file defines the default operating model for any autonomous coding agent working in this repository. Repository-specific canonical status, release-gate, roadmap, security, migration, and `NEXT_*` documents remain authoritative for product direction. This contract governs HOW the work is executed and must not silently replace valid project-specific scope.
+This file governs HOW autonomous agents execute work. Repository-specific canonical status, roadmap, release-gates, security, migrations and `NEXT_*` documents remain authoritative for WHAT is built.
 
-## 1. Mandatory pre-flight repository consistency gate
+Before implementation establish `REPO_CONSISTENCY_GATE = PASS`: fetch/prune; compare GitHub/default branch with the actual local/workspace repo; inspect branch/HEAD/upstream, staged/unstaged/untracked work, local/remote-only commits, stashes/worktrees and relevant branches/PRs; preserve valid work; never destructive-reset/clean for convenience; establish canonical starting SHA. If the user's PC repo is inaccessible, report `LOCAL_PC_NOT_ACCESSIBLE`.
 
-Before architecture work, implementation, refactoring, migrations, dependency changes, commits, pushes, PR operations, or CI:
+Audit repository reality before planning. Existing verified implementation/tests/migrations/docs/runtime/CI and current canonical/`NEXT_*` state override stale plans; do not duplicate completed work. For major multi-slice programs first use read-only Plan/Megaplan (or equivalent) to create/update `docs/agent/MASTER_EXECUTION_PLAN.md`, `docs/agent/GAP_LEDGER.md`, `docs/agent/SLICE_LEDGER.md`, and `docs/agent/CURRENT_STATE.md`. Define dependency-aware slices, invariants, components, migrations/APIs/runtime impact, test/CI profiles, real E2E paths, risks, HUMAN_REQUIRED actions and exact completion gates. Planning is not completion; then switch to autonomous execution without approvals between ordinary slices.
 
-1. identify the GitHub repository, default branch and remote HEAD;
-2. `git fetch --all --prune`;
-3. inspect local path, branch, HEAD, upstream, staged/unstaged/untracked changes, local-only/remote-only commits, stashes and worktrees;
-4. compare local state with the actual upstream/default branch;
-5. inspect relevant open/recent branches/PRs when access permits;
-6. preserve every valid local-only change before reconciliation;
-7. never use destructive reset/clean commands merely to obtain a clean tree;
-8. reconcile deliberately and establish the true canonical starting SHA.
+Autonomous loop: `AUDIT CURRENT DEFAULT BRANCH -> NEXT UNBLOCKED SLICE -> PLAN -> IMPLEMENT -> LOCAL TESTS -> REAL RUNTIME -> E2E -> FIX/RETEST -> CANONICAL SERVER CI WHEN REQUIRED -> FIX UNTIL GREEN -> EVIDENCE -> UPDATE LEDGERS -> NEXT SLICE`.
 
-If the user's PC/local repository is not actually accessible, state `LOCAL_PC_NOT_ACCESSIBLE`; never pretend it was verified.
+After every COMPLETE slice record evidence/exact SHA, update ledgers/current state, recompute dependencies, refresh canonical repo state and continue automatically. A blocker local to one slice must not stop independent unblocked work.
 
-Do not start planned project work until `REPO_CONSISTENCY_GATE = PASS` or a precisely documented HUMAN_REQUIRED blocker prevents reconciliation.
+HUMAN_REQUIRED is limited to genuine external blockers: unavailable credential/API entitlement, owner/policy approval, irreversible production operation, unavailable non-emulatable environment, owner/hardware signature, non-derivable legal/product/commercial decision, or material architecture conflict with equally valid incompatible outcomes. Coding choices, dependencies, test failures, merge conflicts, migrations, refactors and CI failures are not automatically HUMAN_REQUIRED.
 
-## 2. Audit before planning
+No hardcoded success, fabricated evidence, fake external transactions or mocks represented as production. Prefer official sandbox/test APIs; otherwise clearly identify emulator/realistic mock. Visible state must have a real derivation path.
 
-Treat current repository reality as stronger evidence than stale planning text. Before creating new work:
+## Canonical CI policy
+The configured self-hosted/server CI is the PRIMARY canonical CI gate. GitHub Actions is not the default and must not be used merely to duplicate equivalent validation or spend GitHub credits.
 
-- audit existing implementation, tests, migrations, docs, CI, runtime contracts and active branches;
-- determine what is already complete, partial, obsolete, duplicated, blocked or missing;
-- preserve verified work;
-- do not recreate functionality merely because an older roadmap says it is missing;
-- respect the repository's current canonical next slice unless the audit proves it is obsolete or unsafe.
+Each slice records `CI_REQUIRED`, `CI_PROFILE`, expected pipeline and exact completion gate. When CI is required: `IMPLEMENT -> LOCAL TESTS -> REAL RUNTIME -> E2E -> LOCALLY CLEAN -> SERVER CI -> ROOT-CAUSE/FIX FAILURE -> MINIMUM RERUN -> GREEN -> EVIDENCE -> COMPLETE`.
 
-## 3. Plan mode / megaplan phase
+CI is not a debugger. Before each run execute strongest feasible focused/broad tests, DB/migrations/contracts/integration, real runtime, visible E2E/golden path and final diff audit. On failure inspect exact logs, fix locally, rerun relevant checks, then rerun only necessary CI scope. Never blind-rerun.
 
-For every major program or multi-slice task, first use the strongest available read-only planning mode (`Plan`, `Megaplan`, or equivalent) to produce a dependency-aware executable plan grounded in the audited repository.
+A CI-required slice cannot be COMPLETE while canonical CI is failing, skipped, unknown, stale or unexecuted. CI evidence is valid only for the exact tested SHA or proven immutable equivalent. Record CI system, pipeline/run ID, exact SHA, profile, required jobs, result and evidence/log location. A changed SHA requires new/equivalent validated evidence.
 
-The first planning pass must create or update these repository-local control files (paths may be adapted to an existing project convention):
+Default profiles unless stronger repo-specific profiles exist: `FAST` = lint/static/unit/contract; `STANDARD` = FAST + integration + DB/migrations + build; `RUNTIME` = STANDARD + real stack + E2E; `RELEASE` = RUNTIME + full regression + security/release evidence. Use the smallest sufficient profile; final sealing uses the strongest required profile.
 
-- `docs/agent/MASTER_EXECUTION_PLAN.md`
-- `docs/agent/GAP_LEDGER.md`
-- `docs/agent/SLICE_LEDGER.md`
-- `docs/agent/CURRENT_STATE.md`
+GitHub Actions may run only when repo/release policy explicitly requires GitHub-hosted evidence, GitHub integration itself is under test, server CI cannot execute a required gate, or explicit release evidence demands it. Do not automatically fall back to GitHub Actions because server CI is unavailable.
 
-The plan must define concrete slices, dependencies, invariants, affected components, migration/API/runtime impact, tests, real E2E paths, risks, HUMAN_REQUIRED operations and exact completion gates.
+If server CI is not configured/reachable, set `CI_STATUS = NOT_CONFIGURED | UNAVAILABLE`, record the blocker, continue independent work, and keep every CI-required slice not COMPLETE.
 
-Planning is not completion. After the master plan is accepted by the invoking workflow, switch to Agent/Autonomous execution mode. Do not require human approval between ordinary slices.
+CI does not replace real runtime/E2E. Preserve unrelated work, use coherent slice branches/PRs, and merge automatically only when policy permits and all machine-verifiable gates including exact-SHA CI pass. Owner-only gate becomes the precise HUMAN_REQUIRED action.
 
-## 4. Autonomous execution loop
+A slice is COMPLETE only with real implementation, passing local tests, safe data/migrations, working runtime, required E2E, required exact-SHA canonical CI GREEN, evidence and accurate ledgers/docs. Project COMPLETE requires all required slices integrated plus final production-like golden path and release CI.
 
-Execute the approved master plan continuously:
+Statuses: `REPO_CONSISTENCY_GATE`; `SLICE_STATUS`; `PROJECT_STATUS`; `HUMAN_REQUIRED`; `CI_REQUIRED = YES|NO`; `CI_PROFILE = FAST|STANDARD|RUNTIME|RELEASE|<repo-specific>`; `CI_STATUS = NOT_REQUIRED|NOT_CONFIGURED|UNAVAILABLE|PENDING|RUNNING|RED|GREEN`; `CI_SHA = <exact SHA>`.
 
-`AUDIT CURRENT MAIN -> SELECT NEXT UNBLOCKED SLICE -> EXECUTABLE SLICE PLAN -> IMPLEMENT -> LOCAL TESTS -> REAL RUNTIME -> E2E -> FIX -> RETEST -> EVIDENCE -> MATURE CI -> UPDATE LEDGERS -> NEXT SLICE`
-
-When a slice reaches every completion gate:
-
-1. record exact evidence and resulting SHA;
-2. mark it `COMPLETE` in `SLICE_LEDGER`;
-3. refresh `CURRENT_STATE` and `GAP_LEDGER`;
-4. recompute dependencies;
-5. select the next unblocked canonical slice;
-6. continue automatically.
-
-Do not stop merely to ask what to do next when the answer can be derived from the plan, repository state, tests, architecture or established engineering practice.
-
-Before each new slice, fetch/inspect current canonical state again so that work merged by another agent is incorporated rather than duplicated.
-
-## 5. HUMAN_REQUIRED is narrow
-
-Interrupt the human only for a genuine external blocker such as:
-
-- unavailable credential/secret/API entitlement;
-- wallet or hardware signature that must be performed by the owner;
-- owner-only or policy-required approval/merge;
-- irreversible production operation requiring explicit authorization;
-- unavailable external environment/sandbox that cannot be safely emulated;
-- product/legal/commercial decision not derivable from repository truth;
-- material architecture conflict where multiple incompatible product decisions are equally valid.
-
-A normal coding choice, test failure, merge conflict, migration implementation detail, refactor decision or CI failure is NOT automatically HUMAN_REQUIRED. Diagnose and resolve it autonomously where safe.
-
-## 6. Real functionality rule
-
-Do not implement fake functionality to satisfy tests or UI expectations. No hardcoded success state, fabricated evidence, fake external transaction, fake AI behavior, fake settlement or mocked production integration presented as real.
-
-Use real official sandbox/test APIs whenever available. If unavailable, use a clearly identified local emulator or realistic mock and keep the production boundary explicit.
-
-Visible state must have a real derivation path from persisted/runtime evidence.
-
-## 7. Validation standard
-
-CI is regression protection, not the primary debugger.
-
-Before remote CI, perform the strongest feasible local validation:
-
-- focused tests;
-- broader regression suite;
-- database/migration checks;
-- contract/integration tests;
-- real runtime with frontend/backend/database/auth/workers/external services as applicable;
-- visible user E2E/golden path for user-facing workflows;
-- final diff and repository-state audit.
-
-If E2E fails, find root cause, fix it, and restart the golden path from the beginning when the failure invalidates prior evidence.
-
-Prefer one mature CI run per completed slice. Do not burn CI on blind reruns or tiny speculative pushes.
-
-## 8. Safe Git/PR discipline
-
-Preserve unrelated work. Use dedicated slice branches/PRs where the repository workflow expects them. Keep commits coherent and reviewable. Do not combine unrelated future slices into one giant change.
-
-A whole project may have one master plan, but it must not become one giant commit.
-
-Merge automatically only when repository permissions/policy allow it and every machine-verifiable gate is satisfied. If an owner gate is mandatory, prepare the exact verified merge candidate and report only that narrow action as HUMAN_REQUIRED.
-
-## 9. Definition of done
-
-A slice is `COMPLETE` only when implementation is real, relevant tests pass, migrations/data safety are verified, runtime works, required E2E passes, evidence is recorded, docs/ledgers match reality, no known blocker remains inside slice scope, and CI is green when CI is part of the gate.
-
-A project/program is `COMPLETE` only after all required slices are integrated and the final production-like golden path passes end to end.
-
-Never label written code, a plan, mocks, or partial validation as complete.
-
-## 10. Required status vocabulary
-
-Use explicit machine-readable status where useful:
-
-- `REPO_CONSISTENCY_GATE = PASS | BLOCKED`
-- `SLICE_STATUS = READY | ACTIVE | BLOCKED | COMPLETE`
-- `PROJECT_STATUS = ACTIVE | BLOCKED | RELEASE_CANDIDATE | COMPLETE`
-- `HUMAN_REQUIRED = NONE | <precise external action>`
-
-The default objective is maximum safe autonomy with minimum human coordination overhead while preserving repository truth, runtime correctness, security, evidence quality and CI credits.
+Default objective: maximum safe autonomy, real runtime correctness, exact-SHA green server CI when required, and minimal GitHub CI-credit consumption.
