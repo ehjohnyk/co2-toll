@@ -11,3 +11,7 @@ Default execution pattern:
 `AUDIT -> MASTER PLAN -> PARALLEL AUDITS -> IMPLEMENT -> HOSTILE REVIEW -> FOCUSED/FULL TESTS -> REAL RUNTIME/E2E WHERE SAFE -> EXACT-SHA SERVER CI -> CLOSURE -> RESYNC -> NEXT READY ITEM`
 
 Never fabricate external evidence or readiness. Never expose secrets. Never perform irreversible production actions without explicit owner authorization.
+
+## SWE-2 High acceleration program
+
+During the temporary SWE-2 High availability window, every substantial coding workflow must also read and follow `SWE2_HIGH_ACCELERATION_PROTOCOL.md` and maintain `SWE2_HIGH_EXECUTION_QUEUE.md`. SWE-2 High is reserved for the highest-value difficult implementation packages; orchestration, read-only audit and lightweight work should be delegated appropriately. Repository-specific safety and owner authorization remain stricter.
